@@ -29,7 +29,7 @@ const servicesData = [
   {
     title: "Group Classes",
     description: "High-energy group fitness sessions",
-    price: "$25/class",
+    price: "$27/class",
     features: ["Variety of class types", "Experienced instructors", "Community atmosphere", "Flexible scheduling"],
     icon: Users,
     gradient: "from-red-500 to-red-700",
