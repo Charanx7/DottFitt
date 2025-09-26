@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { debounce } from 'lodash';
 import {
@@ -205,125 +203,126 @@ const GymHomePage = () => {
 
   return (
 <div className="min-h-screen bg-black text-white overflow-hidden">
-    <section
-    ref={heroRef}
-     className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black"
-    style={{ marginTop: 0, paddingTop: 0 }}
+<section
+  ref={heroRef}
+  className="relative min-h-[100svh] min-h-screen w-full flex flex-col lg:flex-row items-center justify-center overflow-hidden bg-black"
+  style={{ marginTop: 0, paddingTop: 0 }}
+>
+  {/* Background Glow Layers */}
+  <div className="absolute inset-0">
+    {/* Dark vignette overlay */}
+    <div className="absolute inset-0 bg-gradient-to-br from-black via-transparent to-black opacity-90"></div>
+
+    {/* Extra dark overlay to reduce brightness */}
+    <div className="absolute inset-0 bg-black/40"></div>
+
+    {/* Glow Orbs */}
+    <div className="absolute -bottom-40 -left-40 w-[400px] md:w-[700px] h-[400px] md:h-[700px] rounded-full bg-orange-600/40 blur-[120px] md:blur-[220px]"></div>
+    <div className="absolute top-0 right-0 w-[250px] md:w-[600px] h-[250px] md:h-[600px] rounded-full bg-red-600/30 blur-[90px] md:blur-[200px]"></div>
+    <div className="absolute bottom-20 right-1/2 w-[120px] md:w-[300px] h-[120px] md:h-[300px] rounded-full bg-yellow-500/20 blur-[70px] md:blur-[150px]"></div>
+  </div>
+
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center relative z-10 w-full">
+    {/* Left Content */}
+    <motion.div
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8 }}
+      className="space-y-6 md:space-y-8"
     >
-    {/* Background Glow Layers */}
-    <div className="absolute inset-0">
-        {/* Dark vignette overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-transparent to-black opacity-90"></div>
+      <motion.h1
+        className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight text-white"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        Push Your{" "}
+        <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-500 bg-clip-text text-transparent">
+          Limits
+        </span>{" "}
+        With Us
+      </motion.h1>
 
-        {/* Extra dark overlay to reduce brightness */}
-        <div className="absolute inset-0 bg-black/40"></div>
+      <motion.p
+        className="text-base sm:text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        From beginner to advanced, experience workouts designed to help you
+        achieve peak performance and exceed your fitness goals.
+      </motion.p>
 
-        {/* Glow Orbs */}
-        <div className="absolute -bottom-40 -left-40 w-[700px] h-[700px] rounded-full bg-orange-600/40 blur-[220px]"></div>
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-red-600/30 blur-[200px]"></div>
-        <div className="absolute bottom-20 right-1/2 w-[300px] h-[300px] rounded-full bg-yellow-500/20 blur-[150px]"></div>
-    </div>
+      {/* Buttons */}
+      <motion.div
+        className="flex flex-col sm:flex-row gap-4 sm:gap-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        <button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg shadow-lg shadow-red-600/40 transition-all w-full sm:w-auto">
+          Join Now
+        </button>
+        <button className="backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/20 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 w-full sm:w-auto">
+          <Play size={20} className="text-red-400" fill="currentColor" />
+          Watch Video
+        </button>
+      </motion.div>
 
-    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-        {/* Left Content */}
-        <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        className="space-y-8"
-        >
-        <motion.h1
-            className="text-5xl md:text-6xl font-extrabold leading-tight text-white"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-        >
-            Push Your{" "}
-            <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-500 bg-clip-text text-transparent">
-            Limits
-            </span>{" "}
-            With Us
-        </motion.h1>
-        
-        <motion.p
-            className="text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-        >
-            From beginner to advanced, experience workouts designed to help you
-            achieve peak performance and exceed your fitness goals.
-        </motion.p>
-        
-        {/* Buttons */}
-        <motion.div
-            className="flex flex-col sm:flex-row gap-6"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-        >
-            <button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg shadow-red-600/40 transition-all">
-            Join Now
-            </button>
-            
-            <button className="backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-4 rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2">
-            <Play size={20} className="text-red-400" fill="currentColor" />
-            Watch Video
-            </button>
-        </motion.div>
+      {/* Floating tags */}
+      <motion.div
+        className="flex flex-wrap gap-2 sm:gap-3 pt-2 sm:pt-4"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+      >
+        {[
+          "Personal Training",
+          "Strength",
+          "Group Classes",
+          "Swimming",
+          "Cardio Equipment",
+          "Functional Workouts",
+        ].map((tag, i) => (
+          <span
+            key={i}
+            className="px-3 py-1 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 text-xs sm:text-sm font-medium text-gray-200 border border-red-500/30"
+          >
+            {tag}
+          </span>
+        ))}
+      </motion.div>
+    </motion.div>
 
-        {/* Floating tags */}
-        <motion.div
-            className="flex flex-wrap gap-3 pt-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-        >
-            {[
-            "Personal Training",
-            "Strength",
-            "Group Classes",
-            "Swimming",
-            "Cardio Equipment",
-            "Functional Workouts",
-            ].map((tag, i) => (
-            <span
-                key={i}
-                className="px-4 py-2 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 text-sm font-medium text-gray-200 border border-red-500/30"
-            >
-                {tag}
-            </span>
-            ))}
-        </motion.div>
-        </motion.div>
+    {/* Right Image */}
+    <motion.div
+      initial={{ opacity: 0, x: 50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ type: "spring", stiffness: 60, damping: 18, delay: 0.3 }}
+      className="relative flex justify-center -mt-6 md:-mt-10"
+    >
+      <img
+        src={HeroImage}
+        alt="Fitness professional running"
+        className="w-3/4 sm:w-2/3 md:w-full h-auto max-w-xs sm:max-w-md md:max-w-xl object-cover drop-shadow-[0_0_60px_rgba(255,60,0,0.6)] hover:scale-105 transition-transform duration-700 ease-out"
+      />
+    </motion.div>
+  </div>
 
-        {/* Right Image */}
-        <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ type: "spring", stiffness: 60, damping: 18, delay: 0.3 }}
-        className="relative flex justify-center -mt-10"
-        >
-        <img
-            src={HeroImage}
-            alt="Fitness professional running"
-            className="w-full h-auto max-w-xl object-cover drop-shadow-[0_0_60px_rgba(255,60,0,0.6)] hover:scale-105 transition-transform duration-700 ease-out"
-        />
-        </motion.div>
-    </div>
+  {/* Scroll Indicator */}
+  {!prefersReducedMotion && (
+    <motion.div
+      animate={{ y: [0, -15, 0] }}
+      transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+      className="absolute bottom-6 sm:bottom-10 left-1/2 transform -translate-x-1/2 z-10"
+      aria-hidden="true"
+    >
+      <ChevronDown size={28} sm={36} className="text-red-400" />
+    </motion.div>
+  )}
+</section>
 
-    {/* Scroll Indicator */}
-    {!prefersReducedMotion && (
-        <motion.div
-        animate={{ y: [0, -15, 0] }}
-        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10"
-        aria-hidden="true"
-        >
-        <ChevronDown size={36} className="text-red-400" />
-        </motion.div>
-    )}
-    </section>
+
 
 
 {/* About Section */}
