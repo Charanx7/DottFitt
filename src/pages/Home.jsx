@@ -16,12 +16,12 @@ import Image2 from '../assets/1.png';
 import Image3 from '../assets/y.png';
 import HeroImage from '../assets/b.png';
 import AboutVideo from '../assets/vid1.mp4';
+import GymPromoVideo from '../assets/vid3.mp4';
 
 const servicesData = [
   {
     title: "Personal Training",
     description: "One-on-one sessions with certified trainers",
-    price: "$80/session",
     features: ["Customized workout plans", "Nutrition guidance", "Progress tracking", "24/7 support"],
     icon: Target,
     gradient: "from-red-500 to-red-700",
@@ -29,7 +29,6 @@ const servicesData = [
   {
     title: "Group Classes",
     description: "High-energy group fitness sessions",
-    price: "$27/class",
     features: ["Variety of class types", "Experienced instructors", "Community atmosphere", "Flexible scheduling"],
     icon: Users,
     gradient: "from-red-500 to-red-700",
@@ -37,7 +36,6 @@ const servicesData = [
   {
     title: "Premium Membership",
     description: "Full access to all facilities and services",
-    price: "$99/month",
     features: ["Unlimited gym access", "All group classes", "Personal trainer sessions", "Nutrition consultation"],
     icon: Zap,
     gradient: "from-red-500 to-red-700",
@@ -778,9 +776,9 @@ Experience the ultimate commitment to your health and goals.`}
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
       <motion.div variants={fadeInUp} className="space-y-10">
         {[
-          { icon: MapPin, title: "Visit Our Gym", detail: "123 Fitness Street, Health City, HC 12345", color: "red" },
-          { icon: Phone, title: "Call Us", detail: "(555) 123-FITNESS", color: "red" },
-          { icon: Mail, title: "Email Us", detail: "hello@elevategym.com", color: "red" }
+          { icon: MapPin, title: "Visit Our Gym", detail: "Ovation Kokapet", color: "red" },
+          { icon: Phone, title: "Call Us", detail: "99851 41235", color: "red" },
+          { icon: Mail, title: "Email Us", detail: "Dottfit@gmail.com", color: "red" }
         ].map((contact, index) => (
           <motion.div
             key={index}
@@ -811,71 +809,33 @@ Experience the ultimate commitment to your health and goals.`}
           </motion.div>
         ))}
       </motion.div>
-      <motion.div
-        variants={fadeInUp}
-        className="bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 p-10 rounded-3xl shadow-xl border border-gray-700 backdrop-blur-sm relative overflow-hidden"
-      >
-        <motion.div
-          className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-700"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          transition={{ duration: 1.5 }}
-          viewport={{ once: true }}
-          style={{ willChange: "transform" }}
-        />
-        <h3 className="text-3xl font-bold mb-8 text-white">Schedule a Free Consultation</h3>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <motion.input
-              type="text"
-              placeholder="First Name"
-              className="p-4 border-2 border-gray-600 rounded-2xl focus:outline-none focus:border-red-600 transition-all duration-300 bg-gray-700/50 backdrop-blur-sm text-white placeholder-gray-400"
-              whileFocus={{ scale: 1.02, borderColor: "#DC2626" }}
-            />
-            <motion.input
-              type="text"
-              placeholder="Last Name"
-              className="p-4 border-2 border-gray-600 rounded-2xl focus:outline-none focus:border-red-600 transition-all duration-300 bg-gray-700/50 backdrop-blur-sm text-white placeholder-gray-400"
-              whileFocus={{ scale: 1.02, borderColor: "#DC2626" }}
-            />
-          </div>
-          <motion.input
-            type="email"
-            placeholder="Email Address"
-            className="w-full p-4 border-2 border-gray-600 rounded-2xl focus:outline-none focus:border-red-600 transition-all duration-300 bg-gray-700/50 backdrop-blur-sm text-white placeholder-gray-400"
-            whileFocus={{ scale: 1.02, borderColor: "#DC2626" }}
-          />
-          <motion.input
-            type="tel"
-            placeholder="Phone Number"
-            className="w-full p-4 border-2 border-gray-600 rounded-2xl focus:outline-none focus:border-red-600 transition-all duration-300 bg-gray-700/50 backdrop-blur-sm text-white placeholder-gray-400"
-            whileFocus={{ scale: 1.02, borderColor: "#DC2626" }}
-          />
-          <motion.textarea
-            placeholder="Tell us about your fitness goals..."
-            rows={4}
-            className="w-full p-4 border-2 border-gray-600 rounded-2xl focus:outline-none focus:border-red-600 transition-all duration-300 resize-none bg-gray-700/50 backdrop-blur-sm text-white placeholder-gray-400"
-            whileFocus={{ scale: 1.02, borderColor: "#DC2626" }}
-          />
-          <motion.button
-            whileHover={{
-              scale: 1.03,
-              boxShadow: "0 20px 40px -12px rgba(220, 38, 38, 0.5)"
-            }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => alert('Thank you! We will contact you soon.')}
-            className="w-full py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-lg shadow-xl transition-all duration-300 relative overflow-hidden"
-          >
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600"
-              initial={{ x: "-100%" }}
-              whileHover={{ x: "100%" }}
-              transition={{ duration: 0.6 }}
-            />
-            <span className="relative z-10">Book Free Consultation</span>
-          </motion.button>
-        </div>
-      </motion.div>
+     <motion.div
+  variants={fadeInUp}
+  className="relative rounded-3xl overflow-hidden shadow-xl border border-gray-700"
+>
+  <motion.video
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="w-full h-full object-cover"
+    initial={{ opacity: 0 }}
+    whileInView={{ opacity: 1 }}
+    transition={{ duration: 1.2 }}
+    viewport={{ once: true }}
+  >
+    <source src={GymPromoVideo} type="video/mp4" />
+    Your browser does not support the video tag.
+  </motion.video>
+
+  {/* Optional Overlay */}
+  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+    <h3 className="text-white text-3xl lg:text-4xl font-bold text-center px-4">
+      Transform Your Body with Us
+    </h3>
+  </div>
+</motion.div>
+
     </div>
   </div>
 </AnimatedSection>

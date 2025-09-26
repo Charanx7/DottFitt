@@ -5,7 +5,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AboutPage from "./pages/About";
 import ServicesPage from "./pages/Services";
-
+import FitnessForm from "./pages/Register";
 
 export default function App() {
   return (
@@ -16,7 +16,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<AboutPage/>} />
           <Route path="/Services" element={<ServicesPage/>} />
-
+          <Route path="/Register" element={<FitnessForm/>} />
         </Routes>
       </div>
     </Router>
