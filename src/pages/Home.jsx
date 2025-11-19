@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, useReducer } from 'react';
 import { debounce } from 'lodash';
 import {
   motion, useScroll, useTransform, AnimatePresence, useInView,
@@ -15,6 +15,313 @@ import Image3 from '../assets/y.png';
 import HeroImage from '../assets/b.png';
 import AboutVideo from '../assets/vid1.mp4';
 import GymPromoVideo from '../assets/vid3.mp4';
+
+const initialState = {
+  loading: false,
+  error: null,
+  data: [],
+  filters: {
+    search: '',
+    location: 'All',
+    industry: 'All',
+    sortBy: 'relevance',
+    view: 'cards', // 'cards' or 'table'
+  }
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'FETCH_START':
+      return { ...state, loading: true, error: null };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, data: action.payload, error: null };
+    case 'FETCH_ERROR':
+      return { ...state, loading: false, error: action.payload };
+    case 'SET_FILTER':
+      return { ...state, filters: { ...state.filters, ...action.payload } };
+    case 'RESET_FILTERS':
+      return { ...state, filters: initialState.filters };
+    default:
+      return state;
+  }
+}
+
+const CompaniesSection = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { loading, error, data, filters } = state;
+
+  useEffect(() => {
+    let cancelled = false;
+    dispatch({ type: 'FETCH_START' });
+
+    // Fetch the static db.json from public/
+    fetch('/db.json')
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(json => {
+        if (cancelled) return;
+        // db.json contains { "gyms": [...] }
+        const gyms = Array.isArray(json.gyms) ? json.gyms : json;
+        dispatch({ type: 'FETCH_SUCCESS', payload: gyms });
+      })
+      .catch(err => {
+        if (!cancelled) dispatch({ type: 'FETCH_ERROR', payload: err.message });
+      });
+
+    return () => { cancelled = true; };
+  }, []);
+
+  // derive filter lists
+  const locations = useMemo(() => ['All', ...Array.from(new Set((data || []).map(g => g.location)))], [data]);
+  const industries = useMemo(() => ['All', ...Array.from(new Set((data || []).map(g => g.industry)))], [data]);
+
+  const handleSearch = useCallback(debounce((value) => {
+    dispatch({ type: 'SET_FILTER', payload: { search: value } });
+  }, 250), []);
+
+  const handleChange = (key, value) => {
+    dispatch({ type: 'SET_FILTER', payload: { [key]: value } });
+  };
+
+  const clearFilters = () => dispatch({ type: 'RESET_FILTERS' });
+
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    const s = filters.search.trim().toLowerCase();
+    let list = data.filter(g => {
+      const matchSearch = s === '' || g.name.toLowerCase().includes(s) || g.industry.toLowerCase().includes(s);
+      const matchLocation = filters.location === 'All' || g.location === filters.location;
+      const matchIndustry = filters.industry === 'All' || g.industry === filters.industry;
+      return matchSearch && matchLocation && matchIndustry;
+    });
+
+    if (filters.sortBy === 'rating') list = list.sort((a, b) => b.rating - a.rating);
+    if (filters.sortBy === 'members') list = list.sort((a, b) => b.members - a.members);
+    if (filters.sortBy === 'name') list = list.sort((a, b) => a.name.localeCompare(b.name));
+
+    return list;
+  }, [data, filters]);
+
+  return (
+<section className="py-10 sm:py-16 bg-black text-white px-4 sm:px-6 lg:px-20">
+  <div className="max-w-7xl mx-auto">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6">
+      <div className="flex-1 min-w-0">
+        {/* Heading: scales nicely for mobile -> tablet -> desktop */}
+        <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+          Partner Gyms &amp; <span className="text-red-500">Studios</span>
+        </h3>
+        {/* Paragraph: constrained width so it wraps well on tablets */}
+        <p className="mt-2 text-sm sm:text-base md:text-lg text-gray-400 max-w-xl">
+          Browse and filter nearby gyms, studios and fitness partners. Use the controls to search, filter and switch views.
+        </p>
+      </div>
+
+      {/* Controls: responsive grid so items reflow on tablet without overflow */}
+      <div className="w-full md:w-auto mt-4 md:mt-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3 items-center">
+          {/* Search input spans 2 cols on small screens for comfortable typing */}
+          <div className="col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2">
+            <div className="flex items-center bg-gray-900 rounded-full px-3 py-2 border border-gray-700">
+              <input
+                type="search"
+                aria-label="Search gyms"
+                placeholder="Search name or industry..."
+                defaultValue={filters.search}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full bg-transparent outline-none text-sm sm:text-base placeholder-gray-500"
+              />
+            </div>
+          </div>
+
+          <div className="col-span-1">
+            <select
+              value={filters.location}
+              onChange={(e) => handleChange('location', e.target.value)}
+              className="w-full bg-gray-900 border border-gray-700 rounded-full px-3 py-2 text-sm"
+              aria-label="Filter by location"
+            >
+              {locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+            </select>
+          </div>
+
+          <div className="col-span-1">
+            <select
+              value={filters.industry}
+              onChange={(e) => handleChange('industry', e.target.value)}
+              className="w-full bg-gray-900 border border-gray-700 rounded-full px-3 py-2 text-sm"
+              aria-label="Filter by industry"
+            >
+              {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
+            </select>
+          </div>
+
+          <div className="col-span-1 md:col-span-1 lg:col-span-1">
+            <select
+              value={filters.sortBy}
+              onChange={(e) => handleChange('sortBy', e.target.value)}
+              className="w-full bg-gray-900 border border-gray-700 rounded-full px-3 py-2 text-sm"
+              aria-label="Sort partners"
+            >
+              <option value="relevance">Relevance</option>
+              <option value="rating">Top Rated</option>
+              <option value="members">Most Members</option>
+              <option value="name">Name (A-Z)</option>
+            </select>
+          </div>
+
+          <div className="col-span-1 sm:col-span-2 md:col-span-1 lg:col-span-1 flex gap-2">
+            <button
+              onClick={() => handleChange('view', filters.view === 'cards' ? 'table' : 'cards')}
+              className="w-full md:w-auto px-3 py-2 rounded-full border border-gray-700 bg-gray-900 text-sm whitespace-nowrap"
+              title="Toggle view"
+              aria-pressed={filters.view === 'table'}
+            >
+              {filters.view === 'cards' ? 'Table' : 'Cards'}
+            </button>
+
+            <button
+              onClick={clearFilters}
+              className="w-full md:w-auto px-3 py-2 rounded-full border border-red-600 text-red-400 text-sm"
+              aria-label="Reset filters"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Loading / Error */}
+    {loading && (
+      <div className="py-12 sm:py-20 flex items-center justify-center">
+        <div className="animate-spin w-10 h-10 border-4 border-t-red-600 border-gray-800 rounded-full" />
+      </div>
+    )}
+
+    {error && (
+      <div className="py-8 text-center text-red-400">Failed to load partners. {String(error)}</div>
+    )}
+
+    {/* Content */}
+    {!loading && !error && (
+      <div>
+        {filtered.length === 0 ? (
+          <div className="py-8 text-center text-gray-400">No partners match your filters.</div>
+        ) : (
+          <>
+            {/* CARDS view (responsive grid) */}
+            {filters.view === 'cards' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {filtered.map((g) => (
+                  <motion.div
+                    key={g.id}
+                    layout
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45 }}
+                    className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700 shadow-lg flex flex-col justify-between"
+                    role="article"
+                    aria-labelledby={`gym-${g.id}-title`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <h4 id={`gym-${g.id}-title`} className="text-lg sm:text-xl font-semibold text-white truncate">{g.name}</h4>
+                          <p className="text-xs sm:text-sm text-gray-400 truncate">{g.industry} • {g.location}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="text-base sm:text-lg font-bold text-red-500">{(g.rating || 0).toFixed(1)}</div>
+                          <div className="text-xs sm:text-sm text-gray-400">{(g.members || 0).toLocaleString()} members</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between text-sm text-gray-300">
+                        <div className="truncate">{g.email}</div>
+                        <div className="ml-3 truncate">{g.phone}</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-3">
+                      <a href={g.website} target="_blank" rel="noopener noreferrer" className="px-3 py-2 rounded-full bg-red-600 text-white text-sm flex-1 text-center">Visit</a>
+                      <a href={`mailto:${g.email}`} className="px-3 py-2 rounded-full border border-gray-700 text-sm flex-1 text-center">Contact</a>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {/* TABLE view */}
+            {filters.view === 'table' && (
+              <>
+                {/* Desktop / tablet table */}
+                <div className="hidden md:block overflow-x-auto rounded-lg border border-gray-700">
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gray-900">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-300">Name</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-300">Industry</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-300">Location</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-300">Members</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-300">Rating</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-300">Contact</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-black divide-y divide-gray-800">
+                      {filtered.map(g => (
+                        <tr key={g.id} className="hover:bg-gray-900 transition-colors">
+                          <td className="px-6 py-4 text-sm text-white">{g.name}</td>
+                          <td className="px-6 py-4 text-sm text-gray-300">{g.industry}</td>
+                          <td className="px-6 py-4 text-sm text-gray-300">{g.location}</td>
+                          <td className="px-6 py-4 text-sm text-gray-300">{(g.members || 0).toLocaleString()}</td>
+                          <td className="px-6 py-4 text-sm text-red-500 font-semibold">{(g.rating || 0).toFixed(1)}</td>
+                          <td className="px-6 py-4 text-sm text-gray-300">{g.email} • {g.phone}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile stacked list for table view */}
+                <div className="md:hidden space-y-3">
+                  {filtered.map(g => (
+                    <div key={g.id} className="p-4 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <h4 className="text-base font-semibold text-white truncate">{g.name}</h4>
+                          <p className="text-xs text-gray-400 truncate">{g.industry} • {g.location}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-red-500">{(g.rating || 0).toFixed(1)}</div>
+                          <div className="text-xs text-gray-400">{(g.members || 0).toLocaleString()}</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 text-xs text-gray-300">
+                        <div className="truncate">{g.email}</div>
+                        <div className="truncate">{g.phone}</div>
+                      </div>
+
+                      <div className="mt-3 flex gap-2">
+                        <a href={g.website} target="_blank" rel="noopener noreferrer" className="flex-1 text-center px-2 py-2 rounded-full bg-red-600 text-white text-sm">Visit</a>
+                        <a href={`mailto:${g.email}`} className="flex-1 text-center px-2 py-2 rounded-full border border-gray-700 text-sm">Contact</a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    )}
+  </div>
+</section>
+
+  );
+};
 
 const servicesData = [
   {
@@ -63,7 +370,7 @@ const faqsData = [
   },
 ];
 
-// Utility: AlternatingSection
+
 const AlternatingSection = ({
   imageSrc, title, highlightWord, description, imageLeft = true,
 }) => {
@@ -322,7 +629,7 @@ const GymHomePage = () => {
   )}
 </section>
 
-
+  <CompaniesSection />       
 
 
 {/* About Section */}
@@ -747,6 +1054,8 @@ Experience the ultimate commitment to your health and goals.`}
     </motion.div>
   </div>
 </AnimatedSection>
+ 
+
 
 
      {/* Contact Section */}
